@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "comp-a.fullname" . }}
+  labels:
+    {{- include "comp-a.labels" . | nindent 4 }}
+data:
+  DATAPROVIDER_TOPIC: {{ .Values.env.DATAPROVIDER_TOPIC | default "sample/topic" | quote}}
+  QCLIENT_BROKER_HOST: {{ .Values.env.QCLIENT_BROKER_HOST | default "mqtt" | quote }}
+  QCLIENT_BROKER_PORT: {{ .Values.env.QCLIENT_BROKER_PORT | default "1883" | quote }}
+
+
