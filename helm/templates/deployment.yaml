@@ -1,20 +1,5 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: {{ include "comp-a.fullname" . }}
-  labels:
-    {{- include "comp-a.labels" . | nindent 4 }}
-spec:
-  replicas: {{ .Values.replicaCount }}
-  selector:
-    matchLabels:
-      {{- include "comp-a.selectorLabels" . | nindent 6 }}
-  template:
-    metadata:
-      labels:
-        {{- include "comp-a.selectorLabels" . | nindent 8 }}
+
     spec:
-      {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
