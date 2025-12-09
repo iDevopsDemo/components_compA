@@ -27,4 +27,3 @@ spec:
                 name: {{ include "comp-a.fullname" . }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-
