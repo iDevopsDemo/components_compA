@@ -8,7 +8,7 @@ deployprefix: "p123123-"
 
 image:
   repository: ghcr.io/idevopsdemo/comp-a
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
   tag: latest
 
 imagePullSecrets: []

@@ -2,13 +2,11 @@ name: helm-test
 
 on: push
 
-permissions: {}
-
 jobs:
   lint-test:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      packages: read
     steps:
       - name: Checkout
         uses: actions/checkout@v5.0.0
@@ -53,6 +51,23 @@ jobs:
       - name: Create kind cluster
         if: steps.list-changed.outputs.changed == 'true'
         uses: helm/kind-action@v1.12.0
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Load images into kind
+        if: steps.list-changed.outputs.changed == 'true'
+        run: |
+          for chart in $(ct list-changed --target-branch ${{ github.event.repository.default_branch }}); do
+            image=$(yq e '.image.repository + ":" + .image.tag' "./${chart}/values.yaml")
+            docker pull "$image"
+            kubectl cluster-info --context kind-chart-testing
+            kind load docker-image "$image" --name chart-testing
+          done
 
       - name: Run chart-testing (install)
         if: steps.list-changed.outputs.changed == 'true'
