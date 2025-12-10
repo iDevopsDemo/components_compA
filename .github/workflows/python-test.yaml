@@ -1,4 +1,4 @@
-name: helm-test
+name: python-test
 
 on: push
 
