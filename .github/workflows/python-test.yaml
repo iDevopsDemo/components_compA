@@ -1,3 +1,5 @@
+name: helm-test
+
 on: push
 
 env:
@@ -30,7 +32,7 @@ jobs:
             --file=./sca/pylint-score.svg \
             4=red 6=orange 8=yellow 10=green
     - name: Upload pylint reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: pylint-reports
         path: ./sca
