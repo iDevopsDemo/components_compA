@@ -1,3 +1,5 @@
+name: helm-test
+
 on: push
 
 permissions: {}
