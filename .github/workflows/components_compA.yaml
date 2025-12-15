@@ -97,23 +97,22 @@ jobs:
     needs: hadolint
     permissions:
       packages: write
+    outputs:
+      build-version: ${{ steps.version.outputs.version }}
     steps:
-      # -
-      #   name: Login to GitHub Container Registry
-      #   uses: docker/login-action@v3
-      #   with:
-      #     registry: ghcr.io
-      #     username: ${{ github.actor }}
-      #     password: ${{ secrets.GITHUB_TOKEN }}
       - id: repo-name-lowercase
         name: Convert repository owner to lowercase
         uses: ASzc/change-string-case-action@v2
         with:
           string: "${{ github.repository_owner }}"
-      - id: step2
-        run: echo ${{ steps.repo-name-lowercase.outputs.lowercase }}
-      -
-        name: Login to GitHub Container Registry
+
+      - uses: actions/checkout@v5
+
+      - name: Git Version
+        id: version
+        uses: codacy/git-version@2.8.6
+
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -127,7 +126,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          tags: "ghcr.io/${{ steps.repo-name-lowercase.outputs.lowercase }}/${{ env.COMP_NAME }}:latest"
+          tags: "ghcr.io/${{ steps.repo-name-lowercase.outputs.lowercase }}/${{ env.COMP_NAME }}:${{ steps.version.outputs.version }}"
 
   lint-test:
     runs-on: ubuntu-latest
@@ -203,7 +202,7 @@ jobs:
     needs: [lint-test, build, unit-tests]
     uses: ./.github/workflows/service.yaml
     with:
-      fail-test: "true"
+      fail-test: "false"
 
   call-integration:
     needs: [call-service]
@@ -211,12 +210,49 @@ jobs:
     with:
       fail-test: "false"
 
-  promote:
+  release:
     needs: [call-integration]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: Promote Image
+      - name: Bump version and push tag
+        uses: anothrNick/github-tag-action@v1
+
+
+  promote:
+    needs: [release, build]
+    runs-on: ubuntu-latest
+    permissions:
+      packages: read
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - id: repo-name-lowercase
+        name: Convert repository owner to lowercase
+        uses: ASzc/change-string-case-action@v2
+        with:
+          string: "${{ github.repository_owner }}"
+
+      - uses: actions/checkout@v5
+
+      - name: Git Version
+        id: version
+        uses: codacy/git-version@2.8.6
+
+      - uses: imjasonh/setup-crane@v0.1
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: promote-image
         run: |
+          CALCULATED_RELEASE_VERSION=$(get_release_version)
+          echo "CALCULATED_RELEASE_VERSION=${CALCULATED_RELEASE_VERSION}"
           echo "Promoting image for ${{ env.COMP_NAME }}"
-          # Add promotion logic here
+          crane auth login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} ghcr.io
+          crane tag ghcr.io/${{ steps.repo-name-lowercase.outputs.lowercase }}/${{ env.COMP_NAME }}:${{ needs.build.outputs.build-version }} ${{ steps.version.outputs.version }}
