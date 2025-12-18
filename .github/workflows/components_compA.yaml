@@ -211,7 +211,7 @@ jobs:
       fail-test: "false"
 
   release:
-    needs: [call-integration, pre-commit, scan, pylint, gitleaks]
+    needs: [call-integration, pre-commit, pylint, gitleaks]
     runs-on: ubuntu-latest
     permissions:
       contents: write
