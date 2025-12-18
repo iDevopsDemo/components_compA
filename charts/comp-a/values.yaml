@@ -7,8 +7,8 @@ replicaCount: 1
 deployprefix: "p123123-"
 
 image:
-  repository: docker.artifactory.mydevops.info/xo-sample/comp-a
-  pullPolicy: Always
+  repository: ghcr.io/idevopsdemo/comp-a
+  pullPolicy: IfNotPresent
   tag: latest
 
 imagePullSecrets: []
