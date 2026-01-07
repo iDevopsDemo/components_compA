@@ -80,6 +80,7 @@ jobs:
     steps:
       - uses: iDevopsDemo/environment_cicd/.github/helm-build@main
         with:
+          CHART_DIR: "./charts/comp-a"
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
   call-service:
