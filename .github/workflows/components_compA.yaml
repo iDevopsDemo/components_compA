@@ -72,8 +72,19 @@ jobs:
         with:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
+  helm-build:
+    runs-on: ubuntu-latest
+    needs: [helm-test, docker-build]
+    permissions:
+      packages: write
+    steps:
+      - uses: iDevopsDemo/environment_cicd/.github/helm-build@main
+        with:
+          CHART_DIR: "./charts/comp-a"
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
   call-service:
-    needs: [helm-test, docker-build, unit-tests]
+    needs: [helm-build, docker-build, unit-tests]
     uses: ./.github/workflows/service.yaml
     with:
       fail-test: "false"
