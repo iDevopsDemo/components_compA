@@ -84,7 +84,7 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
   call-service:
-    needs: [helm-test, docker-build, unit-tests]
+    needs: [helm-build, docker-build, unit-tests]
     uses: ./.github/workflows/service.yaml
     with:
       fail-test: "false"
