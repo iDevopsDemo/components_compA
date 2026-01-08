@@ -107,7 +107,7 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
   promote:
-    needs: [release, docker-build]
+    needs: [release, docker-build, helm-build]
     runs-on: ubuntu-latest
     permissions:
       packages: read
@@ -116,3 +116,7 @@ jobs:
         - uses: iDevopsDemo/environment_cicd/.github/promote@main
           with:
             COMP_NAME: "${{ env.COMP_NAME }}"
+            CHART_NAME: "${{ needs.helm-build.outputs.helm-name }}"
+            BUILD_VERSION: "${{ needs.docker-build.outputs.build-version }}"
+            GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+            
