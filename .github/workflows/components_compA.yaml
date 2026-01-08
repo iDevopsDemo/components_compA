@@ -56,9 +56,10 @@ jobs:
     permissions:
       packages: write
     outputs:
-      build-version: ${{ steps.version.outputs.version }}
+      build-version: ${{ steps.docker-build.outputs.version }}
     steps:
       - uses: iDevopsDemo/environment_cicd/.github/docker-build@main
+        id: docker-build
         with:
           COMP_NAME: "${{ env.COMP_NAME }}"
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
@@ -77,8 +78,11 @@ jobs:
     needs: [helm-test, docker-build]
     permissions:
       packages: write
+    outputs:
+      helm-name: ${{ steps.helm-build.outputs.helm-name }}
     steps:
       - uses: iDevopsDemo/environment_cicd/.github/helm-build@main
+        id: helm-build
         with:
           CHART_DIR: "./charts/comp-a"
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
