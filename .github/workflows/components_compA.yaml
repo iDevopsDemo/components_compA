@@ -104,9 +104,15 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    outputs:
+      new_tag: ${{ steps.release.outputs.new_tag }}
+      old_tag: ${{ steps.release.outputs.old_tag }}
+      tag: ${{ steps.release.outputs.tag }}
+      part: ${{ steps.release.outputs.part }}
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: iDevopsDemo/environment_cicd/.github/release@main
+        id: release
         with:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
@@ -115,11 +121,12 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: read
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && needs.release.outputs.new_tag != needs.release.outputs.old_tag
     steps:
         - uses: iDevopsDemo/environment_cicd/.github/promote@main
           with:
             COMP_NAME: "${{ env.COMP_NAME }}"
             CHART_NAME: "${{ needs.helm-build.outputs.chart-name }}"
             BUILD_VERSION: "${{ needs.docker-build.outputs.build-version }}"
+            TARGET_VERSION: "${{ needs.release.outputs.new_tag }}"
             GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
