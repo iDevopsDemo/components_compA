@@ -102,8 +102,9 @@ jobs:
       contents: write
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: Bump version and push tag
-        uses: anothrNick/github-tag-action@v1
+      - uses: iDevopsDemo/environment_cicd/.github/release@main
+        with:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
   promote:
     needs: [release, docker-build]
