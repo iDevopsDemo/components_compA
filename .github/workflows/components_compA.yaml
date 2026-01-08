@@ -119,4 +119,3 @@ jobs:
             CHART_NAME: "${{ needs.helm-build.outputs.helm-name }}"
             BUILD_VERSION: "${{ needs.docker-build.outputs.build-version }}"
             GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-            
