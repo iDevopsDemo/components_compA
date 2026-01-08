@@ -120,7 +120,7 @@ jobs:
     needs: [release, docker-build, helm-build]
     runs-on: ubuntu-latest
     permissions:
-      packages: read
+      packages: write
     if: github.ref == 'refs/heads/main' && needs.release.outputs.new_tag != needs.release.outputs.old_tag
     steps:
         - uses: iDevopsDemo/environment_cicd/.github/promote@main
