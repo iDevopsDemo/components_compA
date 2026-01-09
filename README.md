@@ -39,4 +39,4 @@ docker run --rm --name dataprovider -e DATAPROVIDER_TOPIC='my/message/is/better'
 
 ### Build Test Trigger
 
-123456789
+12345678
