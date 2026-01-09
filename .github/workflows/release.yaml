@@ -55,9 +55,7 @@ jobs:
       - name: promote-image
         run: |
           REPO_NAME=ghcr.io/$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')/${{ env.COMP_NAME }}
-
           echo "Promoting image for ${REPO_NAME}/${{ env.COMP_NAME }} from version ${{ needs.version.outputs.version }} to tag ${{ needs.version.outputs.tag }}"
-          
           crane auth login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} ghcr.io
           crane cp ${REPO_NAME}/${{ env.COMP_NAME }}:${{ needs.version.outputs.version }} ${REPO_NAME}/${{ env.COMP_NAME }}:${{ needs.version.outputs.tag }}
           crane cp ${REPO_NAME}/charts/${{ env.COMP_NAME }}:${{ needs.version.outputs.version }} ${REPO_NAME}/charts/${{ env.COMP_NAME }}:${{ needs.version.outputs.tag }}
