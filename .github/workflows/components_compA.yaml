@@ -44,6 +44,11 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.11']
+    permissions:
+      contents: read
+      issues: read
+      checks: write
+      pull-requests: write
     steps:
       - uses: iDevopsDemo/environment_cicd/.github/python-unit-tests@main
         with:
