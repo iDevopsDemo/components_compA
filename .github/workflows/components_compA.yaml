@@ -1,6 +1,18 @@
 name: components_compA CI
 
-on: push
+on:
+  push:
+    branches:
+      - main
+      - 'bugfix/*'
+      - 'feature/*'
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+'
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+    branches: [ main ]
+  workflow_dispatch:
 
 env:
   COMP_NAME: comp-a
@@ -60,8 +72,6 @@ jobs:
     needs: hadolint
     permissions:
       packages: write
-    outputs:
-      build-version: ${{ steps.docker-build.outputs.build-version }}
     steps:
       - uses: iDevopsDemo/environment_cicd/.github/docker-build@main
         id: docker-build
@@ -104,34 +114,13 @@ jobs:
     with:
       fail-test: "false"
 
-  release:
-    needs: [call-integration, pre-commit, python-lint, gitleaks]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    outputs:
-      new_tag: ${{ steps.release.outputs.new_tag }}
-      old_tag: ${{ steps.release.outputs.old_tag }}
-      tag: ${{ steps.release.outputs.tag }}
-      part: ${{ steps.release.outputs.part }}
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: iDevopsDemo/environment_cicd/.github/release@main
-        id: release
-        with:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-
   promote:
-    needs: [release, docker-build, helm-build]
+    needs: [call-integration]
     runs-on: ubuntu-latest
     permissions:
       packages: write
-    if: github.ref == 'refs/heads/main' && needs.release.outputs.new_tag != needs.release.outputs.old_tag
     steps:
-        - uses: iDevopsDemo/environment_cicd/.github/promote@main
+        - uses: iDevopsDemo/environment_cicd/.github/promote-new@main
           with:
-            COMP_NAME: "${{ env.COMP_NAME }}"
             CHART_NAME: "${{ needs.helm-build.outputs.chart-name }}"
-            BUILD_VERSION: "${{ needs.docker-build.outputs.build-version }}"
-            TARGET_VERSION: "${{ needs.release.outputs.new_tag }}"
             GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
