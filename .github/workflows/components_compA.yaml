@@ -115,7 +115,7 @@ jobs:
       fail-test: "false"
 
   promote:
-    needs: [call-integration]
+    needs: [call-integration, helm-build]
     runs-on: ubuntu-latest
     permissions:
       packages: write
