@@ -13,12 +13,12 @@ BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
 DEFAULT_TOPIC = "sample/message"
 
-def generate(topic):
+def generate(topic: str) -> None:
     call_counter = 0
     last_time = time.time()
     qclient = QClient(topic)
     while True:
-        message = "Hello Lars Nr {}".format(call_counter)
+        message = "Hello Gamesa Nr {}".format(call_counter)
         qclient.publish(message)
         call_counter += 1
         time.sleep(1)
@@ -30,14 +30,14 @@ def generate(topic):
                         qclient.get_number_publish_callbacks())
             last_time = time.time()
 
-def _init_from_env(topic):
+def _init_from_env(topic: str) -> str:
     """ Initialize collector from environment variables """
     env_topic = os.getenv('DATACOLLECTOR_TOPIC')
     if env_topic is None:
         env_topic = topic
     return env_topic
 
-def options():
+def options() -> argparse.Namespace:
     """Parse and polish the command-line options """
     """and supply reasonable defaults."""
     arg_parser = argparse.ArgumentParser(description='DataGenerator', usage="%(prog)s [-t <topic>]")
@@ -45,7 +45,7 @@ def options():
     opt = arg_parser.parse_args()
     return opt
 
-def main():
+def main() -> None:
     opt = options()
     topic = _init_from_env(opt.topic[0])
     generate(topic)
