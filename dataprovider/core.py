@@ -18,7 +18,7 @@ def generate(topic: str) -> None:
     last_time = time.time()
     qclient = QClient(topic)
     while True:
-        message = "Hello Gamesa Nr {}".format(call_counter)
+        message = "Hello Siemens Nr {}".format(call_counter)
         qclient.publish(message)
         call_counter += 1
         time.sleep(1)
